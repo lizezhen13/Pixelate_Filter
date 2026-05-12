@@ -9,15 +9,18 @@ const Camera = (() => {
     videoEl = video;
     canvasEl = canvas;
     return new Promise((resolve) => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        isActive = false;
+        resolve(false);
+        return;
+      }
       const constraints = {
         video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
       };
       navigator.mediaDevices.getUserMedia(constraints)
         .then((s) => {
-          stream = s;
-          videoEl.srcObject = stream;
-          isActive = true;
+          attachStream(s);
           resolve(true);
         })
         .catch(() => {
@@ -26,15 +29,23 @@ const Camera = (() => {
             constraints.video.facingMode = 'user';
             navigator.mediaDevices.getUserMedia(constraints)
               .then((s) => {
-                stream = s;
-                videoEl.srcObject = stream;
-                isActive = true;
+                attachStream(s);
                 resolve(true);
               })
               .catch(() => { isActive = false; resolve(false); });
           } else { isActive = false; resolve(false); }
         });
     });
+  }
+
+  function attachStream(s) {
+    stream = s;
+    videoEl.srcObject = stream;
+    isActive = true;
+    if (videoEl.play) {
+      const playPromise = videoEl.play();
+      if (playPromise && playPromise.catch) playPromise.catch(() => {});
+    }
   }
 
   function stop() {
@@ -46,11 +57,15 @@ const Camera = (() => {
   function switchCamera(video, canvas) {
     facingMode = facingMode === 'environment' ? 'user' : 'environment';
     stop();
-    return video && canvas ? start(video, canvas) : Promise.resolve(false);
+    return video ? start(video, canvas) : Promise.resolve(false);
   }
 
   function capture() {
-    if (!isActive || !videoEl || !canvasEl) return null;
+    if (!isActive || !videoEl) return null;
+    if (!canvasEl) {
+      canvasEl = document.createElement('canvas');
+    }
+    if (!videoEl.videoWidth || !videoEl.videoHeight) return null;
     canvasEl.width = videoEl.videoWidth;
     canvasEl.height = videoEl.videoHeight;
     const ctx = canvasEl.getContext('2d');

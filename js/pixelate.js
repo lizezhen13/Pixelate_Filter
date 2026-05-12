@@ -6,8 +6,8 @@ const Pixelate = (() => {
    * @param {HTMLImageElement|HTMLCanvasElement} source - 输入图片或 Canvas
    * @param {number} blockSize - 像素块大小（2~64）
    * @param {Array} [paletteColors] - 调色板颜色数组 [[r,g,b], ...]，可选
-   * @param {number} [colorDepth] - 色彩深度（≤ 调色板颜色数，用于缩减颜色）
-   * @param {boolean} [isOriginalMode] - 是否为原风格模式（不做颜色量化）
+   * @param {number} [colorDepth] - 每个 RGB 通道可用的色阶数量（2~64）
+   * @param {boolean} [isOriginalMode] - 是否为原风格模式（不套用调色板）
    * @returns {HTMLCanvasElement} 处理后的 Canvas
    */
   function pixelate(source, blockSize, paletteColors, colorDepth, isOriginalMode) {
@@ -15,20 +15,12 @@ const Pixelate = (() => {
       throw new Error('无效的输入参数');
     }
 
-    // 原风格模式：保持原图颜色，只做像素化
-    if (isOriginalMode) {
-      return pixelateOnly(source, blockSize);
-    }
-
-    if (!paletteColors || paletteColors.length === 0) {
+    if (!isOriginalMode && (!paletteColors || paletteColors.length === 0)) {
       throw new Error('请选择调色板');
     }
 
-    // 根据色彩深度缩减调色板颜色数
-    let usedColors = paletteColors;
-    if (colorDepth && colorDepth < paletteColors.length) {
-      usedColors = reducePalette(paletteColors, colorDepth);
-    }
+    const depth = normalizeColorDepth(colorDepth);
+    const usedColors = isOriginalMode ? null : quantizePalette(paletteColors, depth);
 
     // 1. 创建离屏 Canvas，绘制原图
     const srcCanvas = document.createElement('canvas');
@@ -55,13 +47,14 @@ const Pixelate = (() => {
     const smallData = smallCtx.getImageData(0, 0, smallW, smallH);
     const pixels = smallData.data;
 
-    // 4. 按调色板量化颜色（使用缩减后的调色板）
+    // 4. 按色彩深度量化颜色，并在需要时映射到调色板
     for (let i = 0; i < pixels.length; i += 4) {
       const r = pixels[i];
       const g = pixels[i + 1];
       const b = pixels[i + 2];
-      // 找到最近颜色
-      const [nr, ng, nb] = findNearestColor(r, g, b, usedColors);
+      const [nr, ng, nb] = isOriginalMode
+        ? quantizeRgb(r, g, b, depth)
+        : findNearestColor(r, g, b, usedColors);
       pixels[i] = nr;
       pixels[i + 1] = ng;
       pixels[i + 2] = nb;
@@ -131,6 +124,32 @@ const Pixelate = (() => {
       reduced.push(palette[Math.floor(i * step)]);
     }
     return reduced;
+  }
+
+  function normalizeColorDepth(depth) {
+    const value = parseInt(depth, 10);
+    if (!Number.isFinite(value)) return 16;
+    return Math.max(2, Math.min(64, value));
+  }
+
+  function quantizeChannel(value, depth) {
+    const channel = Number(value);
+    if (!Number.isFinite(channel)) return 0;
+    const step = 255 / (depth - 1);
+    const quantized = Math.round(channel / step) * step;
+    return Math.max(0, Math.min(255, Math.round(quantized)));
+  }
+
+  function quantizeRgb(r, g, b, depth) {
+    return [
+      quantizeChannel(r, depth),
+      quantizeChannel(g, depth),
+      quantizeChannel(b, depth),
+    ];
+  }
+
+  function quantizePalette(palette, depth) {
+    return palette.map(([r, g, b]) => quantizeRgb(r, g, b, depth));
   }
 
   /**

@@ -83,13 +83,13 @@
           <div class="panel-section-title">🎨 色彩深度</div>
           <div class="slider-group">
             <div class="slider-label">
-              <span>颜色数</span>
+              <span>每通道色阶</span>
               <span class="slider-value" id="colorDepthValue">16</span>
             </div>
-            <input type="range" class="slider-track" id="colorDepthSlider" min="2" max="256" value="16" aria-label="色彩深度" />
+            <input type="range" class="slider-track" id="colorDepthSlider" min="2" max="64" value="16" aria-label="色彩深度" />
             <div class="slider-input-group">
               <label style="font-size:13px;color:#888;font-weight:600;">精确值</label>
-              <input type="number" class="slider-number-input" id="colorDepthInput" min="2" max="256" value="16" />
+              <input type="number" class="slider-number-input" id="colorDepthInput" min="2" max="64" value="16" />
             </div>
           </div>
         </section>
@@ -191,6 +191,7 @@
       </div>
       <div class="camera-modal-preview">
         <video id="cameraVideo" autoplay playsinline muted></video>
+        <canvas id="cameraHiddenCanvas" class="hidden-canvas"></canvas>
       </div>
       <div class="camera-modal-controls">
         <button class="btn btn-primary btn-sm" id="cameraCaptureBtn">📸 拍摄</button>
@@ -245,7 +246,6 @@
     <div class="modal">
       <div class="modal-title">选择自定义颜色</div>
       <div class="modal-options">
-        <div class="color-picker-preview" id="colorPickerPreview"></div>
         <input type="color" class="color-picker-input" id="colorPickerInput" value="#e94560" />
       </div>
       <div class="modal-actions">

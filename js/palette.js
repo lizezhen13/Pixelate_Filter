@@ -1,4 +1,4 @@
-/* palette.js - 调色板数据与方法（已移除自定义调色板选项） */
+/* palette.js - 调色板数据与方法 */
 
 const Palette = (() => {
   // 调色板数据：[R, G, B]
@@ -7,6 +7,11 @@ const Palette = (() => {
       name: '原风格',
       description: '保持原图色彩，只做像素化',
       colors: [], // 空数组表示使用原图颜色
+    },
+    custom: {
+      name: '自定义',
+      description: '使用用户添加的自定义颜色',
+      colors: [],
     },
     gameboy: {
       name: 'GameBoy 风',
@@ -107,14 +112,16 @@ const Palette = (() => {
     if (activeKey === 'original') {
       return []; // 空数组表示保持原图色彩
     }
-    return palettes[activeKey].colors;
+    return palettes[activeKey] ? palettes[activeKey].colors : [];
   }
 
   /**
    * 设置激活的调色板
    */
   function setActive(key) {
-    activeKey = key;
+    if (palettes[key]) {
+      activeKey = key;
+    }
   }
 
   /**
@@ -138,6 +145,46 @@ const Palette = (() => {
     return palettes[key] ? palettes[key].colors : [];
   }
 
+  function normalizeChannel(value) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return 0;
+    return Math.max(0, Math.min(255, Math.round(num)));
+  }
+
+  function normalizeColor(color) {
+    if (!Array.isArray(color) || color.length < 3) return null;
+    return [
+      normalizeChannel(color[0]),
+      normalizeChannel(color[1]),
+      normalizeChannel(color[2]),
+    ];
+  }
+
+  function addCustomColor(r, g, b) {
+    const colors = palettes.custom.colors;
+    if (colors.length >= 16) return false;
+    colors.push([normalizeChannel(r), normalizeChannel(g), normalizeChannel(b)]);
+    activeKey = 'custom';
+    return true;
+  }
+
+  function removeCustomColor(index) {
+    const colors = palettes.custom.colors;
+    if (index < 0 || index >= colors.length) return false;
+    colors.splice(index, 1);
+    if (activeKey === 'custom' && colors.length === 0) {
+      activeKey = 'original';
+    }
+    return true;
+  }
+
+  function setCustomColors(colors) {
+    palettes.custom.colors = (Array.isArray(colors) ? colors : [])
+      .map(normalizeColor)
+      .filter(Boolean)
+      .slice(0, 16);
+  }
+
   return {
     getAll,
     get,
@@ -146,5 +193,8 @@ const Palette = (() => {
     getActiveKey,
     isOriginalMode,
     getPreviewColors,
+    addCustomColor,
+    removeCustomColor,
+    setCustomColors,
   };
 })();

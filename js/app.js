@@ -38,7 +38,6 @@
   const confirmOkBtn = $('#confirmOkBtn');
   const confirmCancelBtn = $('#confirmCancelBtn');
   const colorPickerModal = $('#colorPickerModal');
-  const colorPickerPreview = $('#colorPickerPreview');
   const colorPickerInput = $('#colorPickerInput');
   const colorPickerConfirmBtn = $('#colorPickerConfirmBtn');
   const colorPickerCancelBtn = $('#colorPickerCancelBtn');
@@ -59,6 +58,7 @@
 
   function init() {
     renderPaletteCards();
+    renderCustomColors();
     bindEvents();
     updateUI();
   }
@@ -75,9 +75,8 @@
   function renderPaletteCards() {
     const all = Palette.getAll();
     paletteGrid.innerHTML = '';
-    const skipKeys = ['custom'];
     Object.entries(all).forEach(([key, pal]) => {
-      if (skipKeys.includes(key)) return;
+      if (key === 'custom') return;
       const card = document.createElement('div');
       card.className = 'palette-card' + (Palette.getActiveKey() === key ? ' active' : '');
       card.dataset.key = key;
@@ -118,6 +117,11 @@
   }
 
   function selectPalette(key) {
+    if (!Palette.getAll()[key]) key = 'original';
+    if (key === 'custom' && Palette.getPreviewColors('custom').length === 0) {
+      openColorPickerModal();
+      return;
+    }
     Palette.setActive(key);
     $$('.palette-card').forEach((c) => {
       const isActive = c.dataset.key === key;
@@ -147,6 +151,7 @@
           e.stopPropagation();
           Palette.removeCustomColor(idx);
           renderCustomColors();
+          renderPaletteCards();
           scheduleRealtimePreview();
         });
         swatch.appendChild(remove);
@@ -212,7 +217,7 @@
     });
     colorDepthInput.addEventListener('change', () => {
       let v = parseInt(colorDepthInput.value, 10);
-      v = Math.max(2, Math.min(256, isNaN(v) ? 16 : v));
+      v = Math.max(2, Math.min(64, isNaN(v) ? 16 : v));
       colorDepthInput.value = v;
       colorDepthSlider.value = v;
       colorDepthValue.textContent = v;
@@ -227,14 +232,13 @@
       const b = parseInt(hex.slice(5, 7), 16);
       if (Palette.addCustomColor(r, g, b)) {
         renderCustomColors();
+        renderPaletteCards();
+        selectPalette('custom');
         closeColorPickerModal();
         scheduleRealtimePreview();
       }
     });
     colorPickerCancelBtn.addEventListener('click', closeColorPickerModal);
-    colorPickerInput.addEventListener('input', () => {
-      colorPickerPreview.style.background = colorPickerInput.value;
-    });
 
     resetBtn.addEventListener('click', () => showEl(confirmModal));
     confirmOkBtn.addEventListener('click', () => { hideEl(confirmModal); resetAll(); });
@@ -531,24 +535,26 @@
   }
 
   function loadHistory(record) {
-    blockSizeSlider.value = record.params.blockSize;
-    blockSizeInput.value = record.params.blockSize;
-    blockSizeValue.textContent = String(record.params.blockSize);
-    colorDepthSlider.value = record.params.colorDepth;
-    colorDepthInput.value = record.params.colorDepth;
-    colorDepthValue.textContent = String(record.params.colorDepth);
-    selectPalette(record.params.paletteKey);
+    const blockSize = Math.max(2, Math.min(64, parseInt(record.params.blockSize, 10) || 8));
+    const colorDepth = Math.max(2, Math.min(64, parseInt(record.params.colorDepth, 10) || 16));
     if (record.params.customColors) {
       Palette.setCustomColors(record.params.customColors);
       renderCustomColors();
+      renderPaletteCards();
     }
+    blockSizeSlider.value = blockSize;
+    blockSizeInput.value = blockSize;
+    blockSizeValue.textContent = String(blockSize);
+    colorDepthSlider.value = colorDepth;
+    colorDepthInput.value = colorDepth;
+    colorDepthValue.textContent = String(colorDepth);
+    selectPalette(record.params.paletteKey);
     closeHistoryDrawer();
     alert('历史参数已恢复，请重新上传原图后系统将自动生成结果。');
   }
 
   function openColorPickerModal() {
     colorPickerInput.value = '#e94560';
-    colorPickerPreview.style.background = '#e94560';
     showEl(colorPickerModal);
   }
   function closeColorPickerModal() { hideEl(colorPickerModal); }
