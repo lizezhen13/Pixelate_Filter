@@ -1,0 +1,66 @@
+/* reset.css - 样式重置 */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'VT323', 'Press Start 2P', 'Courier New', monospace;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+img, canvas {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* 滚动条像素风 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16213e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0f3460;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e94560;
+}
