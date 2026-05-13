@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixelate_Filter Onboarding 方向对比</title>
+  <style>
+    :root {
+      --bg-page: #f3f0e7;
+      --bg-panel: #ffffff;
+      --bg-muted: #ebe8df;
+      --bg-deep: #161722;
+      --text-primary: #141414;
+      --text-secondary: #4a4a4a;
+      --text-muted: #7b7b7b;
+      --border: #c7c3b8;
+      --border-dark: #303030;
+      --accent-red: #e94560;
+      --accent-red-hover: #ff6b81;
+      --accent-blue: #008ed0;
+      --accent-blue-hover: #00a8ef;
+      --accent-purple: #6c5ce7;
+      --accent-green: #27ae60;
+      --accent-orange: #f39c12;
+      --shadow-block: 4px 4px 0 var(--border-dark);
+      --radius: 12px;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text-primary);
+      background:
+        linear-gradient(90deg, rgba(48,48,48,.05) 1px, transparent 1px),
+        linear-gradient(rgba(48,48,48,.05) 1px, transparent 1px),
+        radial-gradient(circle at 20% 10%, rgba(233,69,96,.16), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(0,168,239,.16), transparent 30%),
+        var(--bg-page);
+      background-size: 18px 18px, 18px 18px, auto, auto, auto;
+    }
+
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 34px 26px 46px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 3px solid var(--border-dark);
+      box-shadow: var(--shadow-block);
+      background: var(--bg-panel);
+      padding: 4px;
+    }
+
+    .mark span:nth-child(1) { background: var(--accent-red); }
+    .mark span:nth-child(2) { background: var(--accent-blue-hover); }
+    .mark span:nth-child(3) { background: var(--accent-purple); }
+    .mark span:nth-child(4) { background: var(--accent-green); }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 48px);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .source-note {
+      max-width: 440px;
+      padding: 12px 14px;
+      border: 2px solid var(--border-dark);
+      border-radius: var(--radius);
+      background: var(--bg-panel);
+      box-shadow: var(--shadow-block);
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .option-card {
+      min-height: 760px;
+      display: flex;
+      flex-direction: column;
+      border: 4px solid var(--border-dark);
+      border-radius: 18px;
+      background: var(--bg-panel);
+      box-shadow: 8px 8px 0 var(--border-dark);
+      overflow: hidden;
+    }
+
+    .option-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 4px solid var(--border-dark);
+      background: var(--bg-muted);
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border: 2px solid var(--border-dark);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .screen {
+      position: relative;
+      flex: 1;
+      min-height: 430px;
+      padding: 22px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .copy-area {
+      padding: 16px;
+      border-top: 4px solid var(--border-dark);
+      background: #fff;
+    }
+
+    .tradeoff {
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .copy-btn, .start-btn, .secondary-btn {
+      border: 3px solid var(--border-dark);
+      border-radius: 10px;
+      box-shadow: 3px 3px 0 var(--border-dark);
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 11px 12px;
+      color: #fff;
+      background: var(--bg-deep);
+    }
+
+    .start-btn {
+      padding: 13px 16px;
+      color: #fff;
+      background: var(--accent-red);
+    }
+
+    .secondary-btn {
+      padding: 11px 14px;
+      background: #fff;
+    }
+
+    button:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--border-dark); }
+    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--border-dark); }
+
+    .pixel-row { display: flex; gap: 5px; }
+    .pixel { width: 12px; height: 12px; border: 2px solid rgba(0,0,0,.3); }
+    .p-red { background: var(--accent-red); }
+    .p-blue { background: var(--accent-blue-hover); }
+    .p-purple { background: var(--accent-purple); }
+    .p-green { background: var(--accent-green); }
+    .p-orange { background: var(--accent-orange); }
+    .p-dark { background: var(--bg-deep); }
+    .p-cream { background: var(--bg-page); }
+
+    .mini-panel {
+      border: 3px solid var(--border-dark);
+      border-radius: 12px;
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow-block);
+    }
+
+    .palette-strip { display: flex; gap: 4px; }
+    .palette-strip span { width: 22px; height: 22px; border: 2px solid var(--border-dark); }
+
+    .hero-title { font-size: clamp(28px, 3vw, 44px); line-height: 1.02; letter-spacing: -1.4px; font-weight: 950; }
+    .hero-copy { margin-top: 14px; color: var(--text-secondary); font-size: 15px; line-height: 1.65; font-weight: 650; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+    .scheme-1 .screen {
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.16) 1px, transparent 1px),
+        radial-gradient(circle at 18% 18%, rgba(233,69,96,.52), transparent 27%),
+        radial-gradient(circle at 86% 16%, rgba(0,168,239,.50), transparent 30%),
+        radial-gradient(circle at 55% 88%, rgba(108,92,231,.42), transparent 31%),
+        linear-gradient(135deg, #fff6df 0%, #ffd0d8 34%, #ccf1ff 67%, #e4dbff 100%);
+      background-size: 18px 18px, 18px 18px, auto, auto, auto, auto;
+    }
+    .scheme-1 .screen::before {
+      content: "";
+      position: absolute;
+      inset: -42%;
+      z-index: -1;
+      background: conic-gradient(from 90deg, rgba(233,69,96,.42), rgba(0,168,239,.35), rgba(39,174,96,.35), rgba(243,156,18,.35), rgba(233,69,96,.42));
+      filter: blur(18px) saturate(1.3);
+      animation: color-spin 9s linear infinite;
+    }
+    .scheme-1 .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(255,255,255,.18) 50%, rgba(20,20,20,.05) 50%);
+      background-size: 100% 8px;
+      mix-blend-mode: overlay;
+      opacity: .65;
+      animation: scan-move 3.2s linear infinite;
+    }
+    .scheme-1 .hero-block {
+      max-width: 60%;
+      position: relative;
+      z-index: 8;
+      padding: 18px;
+      border: 3px solid rgba(48,48,48,.68);
+      border-radius: 18px;
+      background: rgba(255,255,255,.34);
+      box-shadow: 5px 5px 0 rgba(48,48,48,.42), 0 18px 38px rgba(48,48,48,.16), inset 0 0 0 2px rgba(255,255,255,.58);
+      backdrop-filter: blur(19px) saturate(1.65);
+      -webkit-backdrop-filter: blur(19px) saturate(1.65);
+      animation: glass-pop 3.6s ease-in-out infinite;
+    }
+    .scheme-1 .hero-title {
+      text-shadow: 2px 2px 0 rgba(233,69,96,.42), 4px 4px 0 rgba(0,168,239,.24);
+    }
+    .scheme-1 .mock-before-after {
+      position: absolute;
+      right: 18px;
+      bottom: 22px;
+      width: 48%;
+      padding: 12px;
+      border-color: rgba(48,48,48,.66);
+      background: rgba(255,255,255,.30);
+      box-shadow: 5px 5px 0 rgba(48,48,48,.38), 0 18px 34px rgba(48,48,48,.14), inset 0 0 0 2px rgba(255,255,255,.55);
+      backdrop-filter: blur(18px) saturate(1.7);
+      -webkit-backdrop-filter: blur(18px) saturate(1.7);
+      transform: rotate(-4deg);
+      animation: card-float 4.8s ease-in-out infinite;
+    }
+    .scheme-1 .mock-before-after::before {
+      content: "LIVE CANVAS → PIXEL ART";
+      display: block;
+      margin-bottom: 9px;
+      color: var(--bg-deep);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .7px;
+    }
+    .scheme-1 .image-grid {
+      height: 190px;
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 3px;
+      animation: pixel-shift 1.4s steps(2) infinite;
+    }
+    .scheme-1 .image-grid span { border: 1px solid rgba(0,0,0,.15); animation: tile-pulse 1.8s steps(2) infinite; }
+    .scheme-1 .image-grid span:nth-child(3n) { animation-delay: .25s; }
+    .scheme-1 .image-grid span:nth-child(4n) { animation-delay: .55s; }
+    .float-pixel { position: absolute; width: 18px; height: 18px; border: 3px solid var(--border-dark); animation: pixel-burst 2.8s ease-in-out infinite; box-shadow: 3px 3px 0 rgba(48,48,48,.35); }
+    .scheme-1 .f1 { right: 42%; top: 28px; background: var(--accent-blue-hover); }
+    .scheme-1 .f2 { right: 22%; top: 72px; background: var(--accent-red); animation-delay: .35s; }
+    .scheme-1 .f3 { right: 10%; bottom: 245px; background: var(--accent-green); animation-delay: .7s; }
+    .scheme-1 .f4 { left: 8%; bottom: 42px; width: 28px; height: 28px; background: var(--accent-orange); animation-delay: .95s; }
+    .scheme-1 .f5 { right: 6%; top: 34px; width: 24px; height: 24px; background: var(--accent-purple); animation-delay: 1.15s; }
+    .scheme-1 .burst-ring {
+      position: absolute;
+      right: 20%;
+      top: 22%;
+      width: 230px;
+      height: 230px;
+      border: 4px dashed rgba(48,48,48,.72);
+      border-radius: 50%;
+      animation: ring-spin 8s linear infinite;
+      opacity: .58;
+    }
+    .scheme-1 .glass-chip {
+      position: absolute;
+      z-index: 3;
+      padding: 8px 10px;
+      border: 2px solid rgba(48,48,48,.8);
+      border-radius: 999px;
+      background: rgba(255,255,255,.42);
+      backdrop-filter: blur(10px) saturate(1.4);
+      -webkit-backdrop-filter: blur(10px) saturate(1.4);
+      box-shadow: 3px 3px 0 rgba(48,48,48,.8);
+      font-size: 11px;
+      font-weight: 950;
+      animation: chip-drift 3.8s ease-in-out infinite;
+    }
+    .scheme-1 .chip-1 { right: 25px; top: 132px; }
+    .scheme-1 .chip-2 { right: 170px; bottom: 238px; animation-delay: .8s; }
+
+    .scheme-2 .screen {
+      color: #f8f4e9;
+      background:
+        linear-gradient(rgba(255,255,255,.07) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255,255,255,.07) 2px, transparent 2px),
+        #111320;
+      background-size: 16px 16px;
+    }
+    .scheme-2 .arcade-frame {
+      border: 5px solid #f8f4e9;
+      border-radius: 22px;
+      background: #080911;
+      box-shadow: inset 0 0 0 6px #2c2f49, 6px 6px 0 #000;
+      padding: 20px;
+      min-height: 384px;
+      text-align: center;
+    }
+    .scheme-2 .coin { color: #ffd166; font-weight: 950; letter-spacing: 1px; animation: blink 1s steps(1) infinite; }
+    .scheme-2 .hero-title { color: #fff; text-shadow: 4px 4px 0 #e94560, 8px 8px 0 #008ed0; margin-top: 24px; }
+    .scheme-2 .hero-copy { color: #d7d9ff; max-width: 460px; margin-inline: auto; }
+    .scheme-2 .start-btn { background: #ffd166; color: #141414; }
+    .scheme-2 .scorebar { display: flex; justify-content: space-between; color: #78ff9a; font-weight: 900; font-size: 12px; }
+
+    .scheme-3 .screen {
+      background: #d5e7ad;
+      color: #173214;
+    }
+    .scheme-3 .device {
+      margin: 0 auto;
+      max-width: 420px;
+      min-height: 390px;
+      padding: 24px;
+      border: 5px solid #173214;
+      border-radius: 28px 28px 44px 44px;
+      background: #9bbb58;
+      box-shadow: 8px 8px 0 #173214;
+    }
+    .scheme-3 .device-screen {
+      padding: 18px;
+      border: 5px solid #173214;
+      border-radius: 14px;
+      background: #d5e7ad;
+      min-height: 240px;
+    }
+    .scheme-3 .hero-title { font-size: 30px; color: #173214; }
+    .scheme-3 .hero-copy { color: #2d4e20; font-size: 14px; }
+    .scheme-3 .start-btn { background: #173214; color: #d5e7ad; }
+    .scheme-3 .dpad { width: 86px; height: 86px; margin-top: 18px; position: relative; }
+    .scheme-3 .dpad::before, .scheme-3 .dpad::after { content: ""; position: absolute; background: #173214; border-radius: 8px; }
+    .scheme-3 .dpad::before { width: 86px; height: 28px; top: 29px; }
+    .scheme-3 .dpad::after { width: 28px; height: 86px; left: 29px; }
+    .scheme-3 .rounds { display: flex; gap: 12px; justify-content: flex-end; margin-top: -60px; }
+    .scheme-3 .rounds span { width: 34px; height: 34px; border-radius: 50%; background: #e94560; border: 4px solid #173214; }
+
+    .scheme-4 .screen {
+      background: linear-gradient(180deg, #fff 0%, #ebe8df 100%);
+    }
+    .scheme-4 .workspace-mock {
+      display: grid;
+      grid-template-columns: 155px 1fr;
+      gap: 12px;
+      height: 316px;
+      margin-top: 18px;
+    }
+    .scheme-4 .sidebar, .scheme-4 .canvas-zone { padding: 12px; }
+    .scheme-4 .control-line { height: 12px; margin: 10px 0; background: var(--bg-muted); border: 2px solid var(--border-dark); }
+    .scheme-4 .slider { height: 10px; margin-top: 14px; background: linear-gradient(90deg, var(--accent-red) 0 52%, #fff 52%); border: 2px solid var(--border-dark); }
+    .scheme-4 .canvas-zone { display: grid; place-items: center; }
+    .scheme-4 .pixel-preview { width: 180px; height: 180px; display: grid; grid-template-columns: repeat(6, 1fr); border: 3px solid var(--border-dark); }
+    .scheme-4 .pixel-preview span { border: 1px solid rgba(0,0,0,.2); }
+
+    .scheme-5 .screen {
+      background:
+        radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 20%),
+        linear-gradient(135deg, #25103c, #111320 54%, #111);
+      color: #fff;
+    }
+    .scheme-5 .neon-card {
+      padding: 18px;
+      border: 3px solid #00f5ff;
+      border-radius: 16px;
+      background: rgba(17,19,32,.82);
+      box-shadow: 0 0 0 4px #e94560, 8px 8px 0 #000, 0 0 32px rgba(0,245,255,.35);
+    }
+    .scheme-5 .hero-title { color: #fff; text-shadow: 3px 3px 0 #e94560; }
+    .scheme-5 .hero-copy { color: #cceeff; }
+    .scheme-5 .start-btn { background: #00f5ff; color: #111320; }
+    .scheme-5 .palette-lab { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+    .scheme-5 .lab-tile { min-height: 92px; padding: 10px; border: 2px solid #fff; background: rgba(255,255,255,.08); font-weight: 900; }
+
+    .scheme-6 .screen {
+      background: #fff7d7;
+    }
+    .scheme-6 .storybook {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+    .scheme-6 .story-copy { padding-right: 4px; }
+    .scheme-6 .hero-title { font-size: 34px; }
+    .scheme-6 .comic {
+      padding: 14px;
+      transform: rotate(2deg);
+    }
+    .scheme-6 .comic-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      height: 205px;
+    }
+    .scheme-6 .speech {
+      position: absolute;
+      right: 32px;
+      top: 18px;
+      max-width: 210px;
+      padding: 10px;
+      border: 3px solid var(--border-dark);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 3px 3px 0 var(--border-dark);
+      font-size: 13px;
+      font-weight: 900;
+      animation: bob 2.4s ease-in-out infinite;
+    }
+    .scheme-6 .steps { margin-top: 18px; display: grid; gap: 8px; }
+    .scheme-6 .steps div { padding: 10px; border: 2px solid var(--border-dark); background: #fff; font-weight: 850; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 10;
+      padding: 12px 16px;
+      border: 3px solid var(--border-dark);
+      border-radius: 12px;
+      background: var(--accent-green);
+      color: #fff;
+      box-shadow: var(--shadow-block);
+      font-weight: 900;
+      transform: translate(-50%, 120px);
+      transition: transform .2s ease;
+    }
+    .toast.show { transform: translate(-50%, 0); }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes color-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes scan-move {
+      to { background-position-y: 32px; }
+    }
+
+    @keyframes glass-pop {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.012); }
+    }
+
+    @keyframes card-float {
+      0%, 100% { transform: rotate(-4deg) translateY(0); }
+      50% { transform: rotate(-1deg) translateY(-14px); }
+    }
+
+    @keyframes pixel-burst {
+      0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      35% { transform: translate(12px, -18px) rotate(8deg) scale(1.18); }
+      70% { transform: translate(-8px, 10px) rotate(-6deg) scale(.92); }
+    }
+
+    @keyframes pixel-shift {
+      0%, 100% { filter: saturate(1); transform: translate(0, 0); }
+      50% { filter: saturate(1.45) contrast(1.08); transform: translate(2px, -2px); }
+    }
+
+    @keyframes tile-pulse {
+      0%, 100% { opacity: .82; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes ring-spin {
+      to { transform: rotate(-360deg); }
+    }
+
+    @keyframes chip-drift {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-9px); }
+    }
+
+    @keyframes blink {
+      0%, 45% { opacity: 1; }
+      46%, 100% { opacity: .25; }
+    }
+
+    @media (max-width: 1180px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .source-note { max-width: none; }
+    }
+
+    @media (max-width: 760px) {
+      .page { padding: 22px 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .option-card { min-height: auto; }
+      .scheme-1 .hero-block { max-width: 100%; }
+      .scheme-1 .mock-before-after { position: relative; width: 100%; right: auto; bottom: auto; margin-top: 22px; }
+      .scheme-4 .workspace-mock, .scheme-6 .storybook { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div>
+          <h1>Pixelate_Filter Onboarding 方向对比</h1>
+          <p class="subtitle">6 个差异明显的动态复古像素艺术方案：布局、语气、信息密度各有侧重。</p>
+        </div>
+      </div>
+      <p class="source-note">参考方向来自复古 / Pixel Art 落地页灵感集合，如 Dribbble Pixel Art UI、One Page Love Pixel Art、Lapa Ninja Retro Style 等；色调与功能锚定当前系统：米白背景、像素红、街机蓝、紫、绿、Canvas 像素化、调色板、导出与历史记录。</p>
+    </header>
+
+    <section class="grid">
+      <article class="option-card scheme-1">
+        <div class="option-head"><h2>01. 爆开彩块 Hero</h2><span class="tag">视觉冲击 / 低信息</span></div>
+        <div class="screen">
+          <div class="burst-ring" aria-hidden="true"></div>
+          <div class="float-pixel f1"></div><div class="float-pixel f2"></div><div class="float-pixel f3"></div><div class="float-pixel f4"></div><div class="float-pixel f5"></div>
+          <div class="glass-chip chip-1">CANVAS LIVE</div>
+          <div class="glass-chip chip-2">RETRO PALETTE</div>
+          <div class="hero-block">
+            <div class="pixel-row" aria-hidden="true"><span class="pixel p-red"></span><span class="pixel p-blue"></span><span class="pixel p-purple"></span><span class="pixel p-green"></span></div>
+            <h3 class="hero-title">把任意图片炸成复古像素画</h3>
+            <p class="hero-copy">上传或拍摄一张图片，Pixelate_Filter 会用 Canvas 实时压缩色彩、放大像素块，并套上 GameBoy、Arcade 或 Cyberpunk 调色板。</p>
+            <div class="actions"><button class="start-btn">开始使用</button></div>
+          </div>
+          <div class="mini-panel mock-before-after">
+            <div class="image-grid" aria-hidden="true">
+              <span class="p-red"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-cream"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-green"></span>
+              <span class="p-red"></span><span class="p-orange"></span><span class="p-orange"></span><span class="p-cream"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-green"></span>
+              <span class="p-dark"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-cream"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-purple"></span><span class="p-green"></span>
+              <span class="p-dark"></span><span class="p-dark"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-cream"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-green"></span>
+              <span class="p-red"></span><span class="p-dark"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-cream"></span>
+              <span class="p-red"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-cream"></span>
+              <span class="p-dark"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-green"></span><span class="p-cream"></span>
+            </div>
+          </div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>最有记忆点，适合年轻、创作型工具；但功能解释少，首次用户可能需要下滑或二级引导。</p>
+          <button class="copy-btn" data-copy="方案 01｜爆开彩块 Hero：我想要视觉冲击强、信息密度低的动态复古像素 onboarding。首屏用大标题“把任意图片炸成复古像素画”、漂浮彩色像素块、原图到像素图的演示卡；突出开始使用按钮，功能说明只保留上传/拍摄、Canvas 实时像素化、复古调色板。取舍：记忆点强，但功能解释较少。">复制这个方向</button>
+        </div>
+      </article>
+
+      <article class="option-card scheme-2">
+        <div class="option-head"><h2>02. 街机投币开场</h2><span class="tag">游戏感 / 情绪化</span></div>
+        <div class="screen">
+          <div class="arcade-frame">
+            <div class="scorebar"><span>SCORE 0020</span><span>PIXEL MODE</span></div>
+            <p class="coin">INSERT IMAGE TO START</p>
+            <h3 class="hero-title">PRESS START<br />TO PIXELATE</h3>
+            <p class="hero-copy">像打开一台街机：投进图片，选择块大小与色彩深度，再导出你的复古战利品。</p>
+            <div class="actions" style="justify-content:center"><button class="start-btn">开始使用</button><button class="secondary-btn">上传图片</button></div>
+          </div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>沉浸感强，按钮行为非常明确；但整体偏暗、偏游戏化，可能弱化“专业图片工具”的可信度。</p>
+          <button class="copy-btn" data-copy="方案 02｜街机投币开场：我想要像街机启动画面一样的 onboarding。布局居中，深色屏幕、分数条、INSERT IMAGE TO START、PRESS START TO PIXELATE、闪烁文字；语气更游戏化，开始使用按钮像街机按键。突出上传图片、调块大小、调色彩深度、导出。取舍：沉浸情绪强，但偏娱乐化。">复制这个方向</button>
+        </div>
+      </article>
+
+      <article class="option-card scheme-3">
+        <div class="option-head"><h2>03. GameBoy 掌机说明书</h2><span class="tag">怀旧 / 极简</span></div>
+        <div class="screen">
+          <div class="device">
+            <div class="device-screen">
+              <h3 class="hero-title">一张照片，四阶绿屏灵魂。</h3>
+              <p class="hero-copy">选择 GameBoy 调色板，降低色彩深度，保留最硬朗的像素边缘。适合想快速得到经典掌机味道的用户。</p>
+              <div class="actions"><button class="start-btn">开始使用</button></div>
+            </div>
+            <div class="dpad" aria-hidden="true"></div>
+            <div class="rounds" aria-hidden="true"><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>风格统一、安静、复古味浓；但色彩不够饱满，和系统多调色板能力的关联较窄。</p>
+          <button class="copy-btn" data-copy="方案 03｜GameBoy 掌机说明书：我想要极简怀旧、偏 GameBoy 掌机的 onboarding。整体用绿屏调色，布局像一台掌机，中间屏幕承载文案“一张照片，四阶绿屏灵魂”，只放一个开始使用按钮。重点表达 GameBoy 调色板、色彩深度、清晰像素边缘。取舍：怀旧统一，但色彩和功能展示较少。">复制这个方向</button>
+        </div>
+      </article>
+
+      <article class="option-card scheme-4">
+        <div class="option-head"><h2>04. 工具台快速导览</h2><span class="tag">产品清晰 / 高信息</span></div>
+        <div class="screen">
+          <h3 class="hero-title">先看懂，再开始像素化。</h3>
+          <p class="hero-copy">把 onboarding 做成缩小版工作台：左侧导入与参数，右侧实时预览，底部展示导出格式和历史记录。</p>
+          <div class="workspace-mock">
+            <div class="mini-panel sidebar">
+              <strong>控制面板</strong>
+              <div class="control-line"></div><div class="control-line" style="width:78%"></div>
+              <div class="slider"></div>
+              <div class="slider" style="background:linear-gradient(90deg,var(--accent-blue) 0 68%,#fff 68%)"></div>
+              <div class="palette-strip" style="margin-top:14px"><span class="p-red"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span></div>
+            </div>
+            <div class="mini-panel canvas-zone">
+              <div class="pixel-preview" aria-hidden="true">
+                <span class="p-red"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span>
+                <span class="p-red"></span><span class="p-orange"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-purple"></span>
+                <span class="p-dark"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-cream"></span><span class="p-blue"></span><span class="p-green"></span>
+                <span class="p-dark"></span><span class="p-dark"></span><span class="p-red"></span><span class="p-cream"></span><span class="p-green"></span><span class="p-green"></span>
+                <span class="p-red"></span><span class="p-dark"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-green"></span><span class="p-cream"></span>
+                <span class="p-red"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-cream"></span>
+              </div>
+            </div>
+          </div>
+          <div class="actions"><button class="start-btn">开始使用</button><button class="secondary-btn">查看流程</button></div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>最利于解释系统功能，上手成本低；但惊喜感弱，更像产品导览而非个性化开场。</p>
+          <button class="copy-btn" data-copy="方案 04｜工具台快速导览：我想要信息密度高、清晰解释功能的 onboarding。首屏像缩小版 Pixelate_Filter 工作台，左侧控制面板展示上传、像素块大小、色彩深度、调色板，右侧显示像素化预览；文案强调先看懂再开始。按钮为开始使用和查看流程。取舍：上手清晰，但个性和惊喜感较弱。">复制这个方向</button>
+        </div>
+      </article>
+
+      <article class="option-card scheme-5">
+        <div class="option-head"><h2>05. Cyberpunk 调色实验室</h2><span class="tag">饱和霓虹 / 中信息</span></div>
+        <div class="screen">
+          <div class="neon-card">
+            <h3 class="hero-title">把照片送进霓虹调色实验室</h3>
+            <p class="hero-copy">从原图色彩到 Cyberpunk、Arcade、经典 16 色，每一次映射都像给图片换一台复古显示器。</p>
+            <div class="palette-lab">
+              <div class="lab-tile">GAMEBOY<br /><div class="palette-strip"><span style="background:#0f380f"></span><span style="background:#306230"></span><span style="background:#8bac0f"></span></div></div>
+              <div class="lab-tile">ARCADE<br /><div class="palette-strip"><span class="p-red"></span><span class="p-orange"></span><span class="p-blue"></span></div></div>
+              <div class="lab-tile">CYBER<br /><div class="palette-strip"><span style="background:#ff2a6d"></span><span style="background:#05d9e8"></span><span style="background:#f9f871"></span></div></div>
+            </div>
+            <div class="actions"><button class="start-btn">开始使用</button><button class="secondary-btn">选择调色板</button></div>
+          </div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>颜色最饱满，能突出调色板能力；但霓虹感较强，可能偏离当前米白轻复古主界面。</p>
+          <button class="copy-btn" data-copy="方案 05｜Cyberpunk 调色实验室：我想要饱满、霓虹、偏调色实验室的 onboarding。深色背景搭配红、青、紫高饱和像素光效，核心展示 GameBoy、Arcade、Cyberpunk 调色板卡片；文案强调把照片送进霓虹调色实验室。按钮为开始使用和选择调色板。取舍：调色板卖点突出，但可能比当前系统更暗更赛博。">复制这个方向</button>
+        </div>
+      </article>
+
+      <article class="option-card scheme-6">
+        <div class="option-head"><h2>06. 像素漫画三步故事</h2><span class="tag">亲和叙事 / 中高信息</span></div>
+        <div class="screen">
+          <div class="speech">嘿，把我变成像素风！</div>
+          <div class="storybook">
+            <div class="story-copy">
+              <h3 class="hero-title">从照片到像素作品，只走三格漫画。</h3>
+              <p class="hero-copy">用更亲切的语气带用户完成：导入图片、选择风格、导出作品。</p>
+              <div class="steps">
+                <div>1 导入：上传 / 拖拽 / 摄像头</div>
+                <div>2 调整：块大小 / 色深 / 调色板</div>
+                <div>3 导出：PNG / JPG / WebP</div>
+              </div>
+              <div class="actions"><button class="start-btn">开始使用</button></div>
+            </div>
+            <div class="mini-panel comic">
+              <div class="comic-grid" aria-hidden="true">
+                <span class="p-cream"></span><span class="p-cream"></span><span class="p-orange"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-purple"></span>
+                <span class="p-cream"></span><span class="p-red"></span><span class="p-orange"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-purple"></span>
+                <span class="p-red"></span><span class="p-red"></span><span class="p-dark"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span>
+                <span class="p-red"></span><span class="p-dark"></span><span class="p-dark"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-green"></span><span class="p-green"></span>
+                <span class="p-red"></span><span class="p-red"></span><span class="p-blue"></span><span class="p-blue"></span><span class="p-green"></span><span class="p-green"></span><span class="p-cream"></span>
+                <span class="p-orange"></span><span class="p-orange"></span><span class="p-blue"></span><span class="p-purple"></span><span class="p-green"></span><span class="p-cream"></span><span class="p-cream"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="copy-area">
+          <p class="tradeoff"><strong>取舍：</strong>亲和、解释完整，适合大众用户；但比方案 01/02 少一些强烈品牌气势。</p>
+          <button class="copy-btn" data-copy="方案 06｜像素漫画三步故事：我想要亲和、有叙事感的 onboarding。页面像一段像素漫画，用气泡和三步流程解释“导入图片 → 调整风格 → 导出作品”，语气轻松，强调上传/拖拽/摄像头、块大小/色深/调色板、PNG/JPG/WebP。取舍：上手友好且信息完整，但品牌气势不如强视觉方案。">复制这个方向</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">已复制，可直接发给我</div>
+
+  <script>
+    const toast = document.getElementById('toast');
+    const showToast = () => {
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 1700);
+    };
+
+    document.querySelectorAll('.copy-btn').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const text = button.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (error) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+        }
+        button.textContent = '已复制方向信息';
+        showToast();
+        window.setTimeout(() => { button.textContent = '复制这个方向'; }, 1400);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ import {
   Upload,
   X,
 } from 'lucide-vue-next';
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CameraController } from './lib/camera';
 import {
   addHistoryRecord,
@@ -65,6 +65,9 @@ const selectedScale = ref(1);
 const colorPickerValue = ref('#e94560');
 const notice = ref<{ type: NoticeType; text: string } | null>(null);
 const cameraSwitching = ref(false);
+const showOnboarding = ref(window.localStorage.getItem('pixelate_filter_onboarded') !== 'true');
+const isAppReady = ref(false);
+const isEnteringWorkspace = ref(false);
 
 let previewTimer: number | undefined;
 let saveHistoryTimer: number | undefined;
@@ -75,6 +78,8 @@ const palettes = computed<PaletteDefinition[]>(() => [
   ...basePalettes,
   createCustomPalette(customColors.value),
 ]);
+
+const builtInPalettes = computed<PaletteDefinition[]>(() => [...basePalettes]);
 
 const activePalette = computed(() => {
   return palettes.value.find((palette) => palette.key === activePaletteKey.value) ?? palettes.value[0];
@@ -88,6 +93,37 @@ const loadingPixels = Array.from({ length: 48 }, (_, index) => index);
 watch([blockSize, colorDepth, activePaletteKey, customColors], () => {
   schedulePreview();
 });
+
+onMounted(() => {
+  window.setTimeout(() => {
+    isAppReady.value = true;
+  }, 80);
+});
+
+function enterWorkspace(): void {
+  isEnteringWorkspace.value = true;
+  window.localStorage.setItem('pixelate_filter_onboarded', 'true');
+
+  window.setTimeout(() => {
+    showOnboarding.value = false;
+    isEnteringWorkspace.value = false;
+  }, 520);
+}
+
+function returnToOnboarding(): void {
+  window.localStorage.removeItem('pixelate_filter_onboarded');
+  showHistoryDrawer.value = false;
+  showDownloadModal.value = false;
+  showResetConfirm.value = false;
+  showColorPicker.value = false;
+  closeCameraModal();
+  isAppReady.value = false;
+  showOnboarding.value = true;
+
+  window.setTimeout(() => {
+    isAppReady.value = true;
+  }, 80);
+}
 
 function setNotice(type: NoticeType, text: string): void {
   notice.value = { type, text };
@@ -436,9 +472,47 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="app-shell">
+  <section
+    v-if="showOnboarding"
+    class="onboarding-page"
+    :class="{ 'app-ready': isAppReady, 'is-leaving': isEnteringWorkspace }"
+    aria-label="Pixelate_Filter 首次引导"
+  >
+    <div class="onboarding-bg-ring" aria-hidden="true" />
+    <div class="onboarding-pixel f1" aria-hidden="true" />
+    <div class="onboarding-pixel f2" aria-hidden="true" />
+    <div class="onboarding-pixel f3" aria-hidden="true" />
+    <div class="onboarding-pixel f4" aria-hidden="true" />
+    <div class="onboarding-pixel f5" aria-hidden="true" />
+    <div class="onboarding-chip chip-1">CANVAS LIVE</div>
+    <div class="onboarding-chip chip-2">RETRO PALETTE</div>
+
+    <div class="onboarding-hero-card stagger-item">
+      <div class="onboarding-mark" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <h1>把任意图片炸成复古像素画</h1>
+      <p>
+        上传或拍摄一张图片，Pixelate_Filter 会用 Canvas 实时压缩色彩、放大像素块，并套上 GameBoy、Arcade
+        或 Cyberpunk 调色板。
+      </p>
+      <button class="onboarding-start" type="button" @click="enterWorkspace">开始使用</button>
+    </div>
+
+    <div class="onboarding-preview-card stagger-item" aria-hidden="true">
+      <strong>LIVE CANVAS → PIXEL ART</strong>
+      <div class="onboarding-pixel-art">
+        <span v-for="pixel in 63" :key="pixel" :class="`tile-${pixel % 7}`" />
+      </div>
+    </div>
+  </section>
+
+  <div v-else class="app-shell" :class="{ 'app-ready': isAppReady }">
     <header class="app-header">
-      <div class="brand">
+      <button class="brand brand-button" type="button" title="返回引导页" @click="returnToOnboarding">
         <div class="brand-mark" aria-hidden="true">
           <span />
           <span />
@@ -449,7 +523,7 @@ onBeforeUnmount(() => {
           <h1>Pixelate_Filter</h1>
           <p>Canvas 图片像素化工作台</p>
         </div>
-      </div>
+      </button>
 
       <nav class="header-actions" aria-label="全局操作">
         <button class="icon-text-button" type="button" title="打开历史记录" @click="showHistoryDrawer = true">
@@ -555,7 +629,7 @@ onBeforeUnmount(() => {
           <h2>调色板</h2>
           <div class="palette-grid" role="radiogroup" aria-label="调色板">
             <button
-              v-for="palette in palettes"
+              v-for="palette in builtInPalettes"
               :key="palette.key"
               class="palette-card"
               :class="{ active: activePaletteKey === palette.key }"
@@ -576,6 +650,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
 
+          <h3 class="custom-color-title">自定义颜色</h3>
           <div class="custom-color-row">
             <button class="add-color" type="button" title="添加自定义颜色" @click="openColorPicker">
               <Plus :size="18" aria-hidden="true" />
@@ -600,35 +675,39 @@ onBeforeUnmount(() => {
 
       <section class="preview-panel" aria-label="图片预览">
         <div class="preview-stage">
-          <div v-if="!hasImage" class="preview-placeholder">
-            <ImageIcon :size="64" aria-hidden="true" />
-            <p>上传图片后开始像素化处理</p>
-          </div>
+          <Transition name="soft-pop" mode="out-in">
+            <div v-if="!hasImage" class="preview-placeholder">
+              <ImageIcon :size="64" aria-hidden="true" />
+              <p>上传图片后开始像素化处理</p>
+            </div>
 
-          <div v-else class="preview-stack">
-            <div class="canvas-section">
-              <div class="canvas-label">原图</div>
-              <div class="canvas-frame">
-                <canvas ref="originalCanvas" />
+            <div v-else class="preview-stack">
+              <div class="canvas-section">
+                <div class="canvas-label">原图</div>
+                <div class="canvas-frame">
+                  <canvas ref="originalCanvas" />
+                </div>
+              </div>
+
+              <div class="preview-divider">像素化结果</div>
+
+              <div class="canvas-section">
+                <div class="canvas-label">处理后</div>
+                <div class="canvas-frame">
+                  <canvas ref="resultCanvas" />
+                </div>
               </div>
             </div>
+          </Transition>
 
-            <div class="preview-divider">像素化结果</div>
-
-            <div class="canvas-section">
-              <div class="canvas-label">处理后</div>
-              <div class="canvas-frame">
-                <canvas ref="resultCanvas" />
+          <Transition name="loading-fade">
+            <div v-if="isLoading" class="loading-overlay">
+              <div class="loading-grid" aria-hidden="true">
+                <span v-for="pixel in loadingPixels" :key="pixel" />
               </div>
+              <strong>PIXELATING...</strong>
             </div>
-          </div>
-
-          <div v-if="isLoading" class="loading-overlay">
-            <div class="loading-grid" aria-hidden="true">
-              <span v-for="pixel in loadingPixels" :key="pixel" />
-            </div>
-            <strong>PIXELATING...</strong>
-          </div>
+          </Transition>
         </div>
 
         <div class="action-bar">
@@ -651,134 +730,144 @@ onBeforeUnmount(() => {
     </Transition>
 
     <Teleport to="body">
-      <div v-if="showHistoryDrawer" class="drawer-overlay" @click.self="showHistoryDrawer = false">
-        <aside class="drawer-panel" aria-label="历史记录">
-          <header class="drawer-header">
-            <h2>历史记录</h2>
-            <button class="icon-button" type="button" title="关闭历史记录" @click="showHistoryDrawer = false">
-              <X :size="20" aria-hidden="true" />
-              <span class="sr-only">关闭历史记录</span>
-            </button>
-          </header>
+      <Transition name="drawer-slide">
+        <div v-if="showHistoryDrawer" class="drawer-overlay" @click.self="showHistoryDrawer = false">
+          <aside class="drawer-panel" aria-label="历史记录">
+            <header class="drawer-header">
+              <h2>历史记录</h2>
+              <button class="icon-button" type="button" title="关闭历史记录" @click="showHistoryDrawer = false">
+                <X :size="20" aria-hidden="true" />
+                <span class="sr-only">关闭历史记录</span>
+              </button>
+            </header>
 
-          <div class="drawer-body">
-            <div v-if="historyRecords.length === 0" class="history-empty">暂无历史记录</div>
-            <button
-              v-for="record in historyRecords"
-              v-else
-              :key="record.id"
-              class="history-item"
-              type="button"
-              @click="loadHistoryRecord(record)"
-            >
-              <img :src="record.thumbnail" alt="" />
-              <span>
-                <strong>{{ record.params.paletteKey === 'custom' ? '自定义' : record.params.paletteKey }}</strong>
-                <small>块 {{ record.params.blockSize }} / 色深 {{ record.params.colorDepth }}</small>
-                <small>{{ formatHistoryTime(record.timestamp) }}</small>
-              </span>
-            </button>
-          </div>
-
-          <footer class="drawer-footer">
-            <button class="button danger full-width" type="button" @click="clearHistoryRecords">
-              <Trash2 :size="17" aria-hidden="true" />
-              <span>清空历史</span>
-            </button>
-          </footer>
-        </aside>
-      </div>
-
-      <div v-if="showCameraModal" class="modal-overlay dark" @click.self="closeCameraModal">
-        <section class="camera-modal" aria-label="摄像头拍摄">
-          <header class="modal-header">
-            <h2>摄像头拍摄</h2>
-            <button class="icon-button" type="button" title="关闭摄像头" @click="closeCameraModal">
-              <X :size="20" aria-hidden="true" />
-              <span class="sr-only">关闭摄像头</span>
-            </button>
-          </header>
-          <div class="camera-preview">
-            <video ref="cameraVideo" autoplay playsinline muted />
-          </div>
-          <div class="modal-actions">
-            <button class="button success" type="button" @click="captureFromCamera">
-              <Check :size="18" aria-hidden="true" />
-              <span>使用画面</span>
-            </button>
-            <button class="button secondary" type="button" :disabled="cameraSwitching" @click="switchCamera">
-              <RotateCcw :size="18" aria-hidden="true" />
-              <span>切换镜头</span>
-            </button>
-          </div>
-        </section>
-      </div>
-
-      <div v-if="showDownloadModal" class="modal-overlay" @click.self="showDownloadModal = false">
-        <section class="modal" aria-label="导出图片">
-          <h2>导出图片</h2>
-          <div class="option-group">
-            <span>格式</span>
-            <div class="segmented">
+            <div class="drawer-body">
+              <div v-if="historyRecords.length === 0" class="history-empty">暂无历史记录</div>
               <button
-                v-for="format in ['png', 'jpg', 'webp']"
-                :key="format"
-                :class="{ active: selectedDownloadFormat === format }"
+                v-for="record in historyRecords"
+                v-else
+                :key="record.id"
+                class="history-item"
                 type="button"
-                @click="selectedDownloadFormat = format as DownloadFormat"
+                @click="loadHistoryRecord(record)"
               >
-                {{ format.toUpperCase() }}
+                <img :src="record.thumbnail" alt="" />
+                <span>
+                  <strong>{{ record.params.paletteKey === 'custom' ? '自定义' : record.params.paletteKey }}</strong>
+                  <small>块 {{ record.params.blockSize }} / 色深 {{ record.params.colorDepth }}</small>
+                  <small>{{ formatHistoryTime(record.timestamp) }}</small>
+                </span>
               </button>
             </div>
-          </div>
-          <div class="option-group">
-            <span>倍率</span>
-            <div class="segmented">
-              <button
-                v-for="scale in [1, 2, 4]"
-                :key="scale"
-                :class="{ active: selectedScale === scale }"
-                type="button"
-                @click="selectedScale = scale"
-              >
-                {{ scale }}x
+
+            <footer class="drawer-footer">
+              <button class="button danger full-width" type="button" @click="clearHistoryRecords">
+                <Trash2 :size="17" aria-hidden="true" />
+                <span>清空历史</span>
+              </button>
+            </footer>
+          </aside>
+        </div>
+      </Transition>
+
+      <Transition name="modal-pop">
+        <div v-if="showCameraModal" class="modal-overlay dark" @click.self="closeCameraModal">
+          <section class="camera-modal" aria-label="摄像头拍摄">
+            <header class="modal-header">
+              <h2>摄像头拍摄</h2>
+              <button class="icon-button" type="button" title="关闭摄像头" @click="closeCameraModal">
+                <X :size="20" aria-hidden="true" />
+                <span class="sr-only">关闭摄像头</span>
+              </button>
+            </header>
+            <div class="camera-preview">
+              <video ref="cameraVideo" autoplay playsinline muted />
+            </div>
+            <div class="modal-actions">
+              <button class="button success" type="button" @click="captureFromCamera">
+                <Check :size="18" aria-hidden="true" />
+                <span>使用画面</span>
+              </button>
+              <button class="button secondary" type="button" :disabled="cameraSwitching" @click="switchCamera">
+                <RotateCcw :size="18" aria-hidden="true" />
+                <span>切换镜头</span>
               </button>
             </div>
-          </div>
-          <div class="modal-actions">
-            <button class="button success" type="button" @click="downloadResult">
-              <Download :size="18" aria-hidden="true" />
-              <span>确认导出</span>
-            </button>
-            <button class="button secondary" type="button" @click="showDownloadModal = false">取消</button>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      </Transition>
 
-      <div v-if="showResetConfirm" class="modal-overlay" @click.self="showResetConfirm = false">
-        <section class="modal confirm" aria-label="确认重置">
-          <h2>确认重置</h2>
-          <p>当前图片和处理结果会被清空，历史记录不会删除。</p>
-          <div class="modal-actions">
-            <button class="button danger" type="button" @click="resetAll">确认重置</button>
-            <button class="button secondary" type="button" @click="showResetConfirm = false">取消</button>
-          </div>
-        </section>
-      </div>
+      <Transition name="modal-pop">
+        <div v-if="showDownloadModal" class="modal-overlay" @click.self="showDownloadModal = false">
+          <section class="modal" aria-label="导出图片">
+            <h2>导出图片</h2>
+            <div class="option-group">
+              <span>格式</span>
+              <div class="segmented">
+                <button
+                  v-for="format in ['png', 'jpg', 'webp']"
+                  :key="format"
+                  :class="{ active: selectedDownloadFormat === format }"
+                  type="button"
+                  @click="selectedDownloadFormat = format as DownloadFormat"
+                >
+                  {{ format.toUpperCase() }}
+                </button>
+              </div>
+            </div>
+            <div class="option-group">
+              <span>倍率</span>
+              <div class="segmented">
+                <button
+                  v-for="scale in [1, 2, 4]"
+                  :key="scale"
+                  :class="{ active: selectedScale === scale }"
+                  type="button"
+                  @click="selectedScale = scale"
+                >
+                  {{ scale }}x
+                </button>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button class="button success" type="button" @click="downloadResult">
+                <Download :size="18" aria-hidden="true" />
+                <span>确认导出</span>
+              </button>
+              <button class="button secondary" type="button" @click="showDownloadModal = false">取消</button>
+            </div>
+          </section>
+        </div>
+      </Transition>
 
-      <div v-if="showColorPicker" class="modal-overlay" @click.self="showColorPicker = false">
-        <section class="modal color-picker" aria-label="添加自定义颜色">
-          <h2>添加自定义颜色</h2>
-          <input v-model="colorPickerValue" type="color" />
-          <div class="modal-actions">
-            <button class="button success" type="button" @click="addCustomColor">
-              <Plus :size="18" aria-hidden="true" />
-              <span>添加</span>
-            </button>
-            <button class="button secondary" type="button" @click="showColorPicker = false">取消</button>
-          </div>
-        </section>
-      </div>
+      <Transition name="modal-pop">
+        <div v-if="showResetConfirm" class="modal-overlay" @click.self="showResetConfirm = false">
+          <section class="modal confirm" aria-label="确认重置">
+            <h2>确认重置</h2>
+            <p>当前图片和处理结果会被清空，历史记录不会删除。</p>
+            <div class="modal-actions">
+              <button class="button danger" type="button" @click="resetAll">确认重置</button>
+              <button class="button secondary" type="button" @click="showResetConfirm = false">取消</button>
+            </div>
+          </section>
+        </div>
+      </Transition>
+
+      <Transition name="modal-pop">
+        <div v-if="showColorPicker" class="modal-overlay" @click.self="showColorPicker = false">
+          <section class="modal color-picker" aria-label="添加自定义颜色">
+            <h2>添加自定义颜色</h2>
+            <input v-model="colorPickerValue" type="color" />
+            <div class="modal-actions">
+              <button class="button success" type="button" @click="addCustomColor">
+                <Plus :size="18" aria-hidden="true" />
+                <span>添加</span>
+              </button>
+              <button class="button secondary" type="button" @click="showColorPicker = false">取消</button>
+            </div>
+          </section>
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
