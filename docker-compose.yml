@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  pixelate-filter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pixelate-filter-app
+    ports:
+      - "1212:1212"
+    environment:
+      - NODE_ENV=production
+      - PORT=1212
+    restart: unless-stopped
+    networks:
+      - pixelate-network
+
+networks:
+  pixelate-network:
+    driver: bridge

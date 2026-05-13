@@ -1,99 +1,149 @@
-# Pixelate_Filter 🎮
+# Pixelate_Filter
 
-Pixelate_Filter 是一款轻量级纯前端像素风图片转化工具。无需登录、无需服务器，所有处理在浏览器端完成，保护您的隐私。
+Pixelate_Filter 是一个基于 Vue 3、Vite、TypeScript 和 Canvas API 的图片像素化工具。它支持本地图片上传、拖拽导入、摄像头采集、实时像素化预览、调色板映射、自定义颜色、历史记录和多格式导出。
 
-## ✨ 功能特性
+## 技术栈
 
-| 功能 | 说明 |
-|------|------|
-| 📁 图片上传 | 支持 JPG / PNG / WebP / BMP，拖拽或点击上传 |
-| 📷 摄像头拍摄 | 调用摄像头实时拍摄，支持前后镜头切换 |
-| 🔲 像素块调节 | 滑块 + 精确输入，范围 2~64 |
-| 🎨 调色板风格 | GameBoy / 复古街机 / 经典像素 / 赛博朋克 / 自定义 |
-| ⚡ 一键像素化 | 实时预览处理效果 |
-| 🔲 原图对比 | 可拖拽分割线对比原图与结果 |
-| 💾 多格式下载 | 支持 PNG / JPG / WebP，可选 1x/2x/4x 分辨率 |
-| 📜 历史记录 | 浏览器 LocalStorage 保存最近 20 条记录 |
-| 🔄 重置 | 二次确认防止误操作 |
+| 类型 | 方案 |
+| --- | --- |
+| 前端框架 | Vue 3 + Composition API |
+| 构建工具 | Vite |
+| 类型系统 | TypeScript |
+| 图像处理 | Canvas API |
+| 图标 | lucide-vue-next |
+| 本地存储 | LocalStorage |
 
-## 🚀 快速开始
+## 功能
 
-无需安装任何依赖，直接打开 `index.html` 即可运行：
+- 图片上传与拖拽导入，支持 JPG、PNG、WebP、BMP，限制 20MB。
+- 摄像头拍摄并直接进入像素化流程。
+- 像素块大小和色彩深度实时调整。
+- 原图色彩、GameBoy、Arcade、经典 16 色、Cyberpunk 和自定义调色板。
+- 原图与处理后结果上下对比预览。
+- PNG、JPG、WebP 导出，支持 1x、2x、4x 倍率。
+- 最近 20 条处理参数历史记录。
+
+## 开发
 
 ```bash
-# 克隆仓库
-git clone https://github.com/yourusername/Pixelate_Filter.git
-cd Pixelate_Filter
-
-# 直接打开 index.html（任选一种方式）
-open index.html              # macOS
-start index.html             # Windows
-xdg-open index.html          # Linux
-
-# 或使用本地服务器（推荐）
-npx serve .
-# 然后访问 http://localhost:3000
+npm install
+npm run dev
 ```
 
-## 📁 项目结构
+开发服务器地址为 `http://localhost:1212`。如果 Windows PowerShell 拦截 `npm.ps1`，请使用 `npm.cmd`：
 
+```bash
+npm.cmd install
+npm.cmd run dev
 ```
+
+## 构建
+
+```bash
+npm run build
+```
+
+构建流程会先执行 TypeScript/Vue 类型检查，再执行 Vite 生产构建。构建产物输出到 `dist/`。
+
+## 预览
+
+构建后可以使用以下命令预览生产版本：
+
+```bash
+npm run preview
+```
+
+预览服务器地址为 `http://localhost:1212`。
+
+## 部署
+
+### Vercel 部署
+
+项目已配置 `vercel.json`，可以直接部署到 Vercel：
+
+1. 在 Vercel 控制台导入项目
+2. Vercel 会自动识别配置并部署
+3. 构建命令：`npm run build`
+4. 输出目录：`dist`
+
+### Docker 部署
+
+项目包含完整的 Docker 配置，支持容器化部署：
+
+#### 使用 Docker Compose（推荐）
+
+```bash
+# 构建并启动容器
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止容器
+docker-compose down
+```
+
+应用将通过 `http://localhost:1212` 访问。
+
+#### 使用 Docker 命令
+
+```bash
+# 构建镜像
+docker build -t pixelate-filter .
+
+# 运行容器
+docker run -d -p 1212:1212 --name pixelate-filter-app pixelate-filter
+
+# 查看日志
+docker logs -f pixelate-filter-app
+
+# 停止容器
+docker stop pixelate-filter-app
+```
+
+### 生产环境启动
+
+如果不使用 Docker，也可以直接启动生产服务器：
+
+```bash
+npm run start
+```
+
+服务器将通过 `http://localhost:1212` 提供服。
+
+## 测试与验证
+
+当前项目没有独立的单元测试框架，`npm test` 作为基础质量门禁，会执行完整类型检查和生产构建：
+
+```bash
+npm test
+```
+
+本次重构后的验证结果：
+
+- `npm.cmd ls --depth=0`：依赖解析正常。
+- `npm.cmd run build`：`vue-tsc --noEmit` 与 Vite 构建通过。
+- 浏览器冒烟验证通过：首屏渲染、自定义颜色添加、图片上传、原图/结果 Canvas 输出、像素块参数调整、JPG 2x 导出、历史记录保存、控制台无错误。
+
+建议后续如果继续扩展功能，可以加入 Vitest 覆盖 `src/lib/pixelate.ts`、`src/lib/palettes.ts` 等纯逻辑模块，再加入 Playwright/Cypress 覆盖上传、导出和历史记录这类浏览器流程。
+
+## 项目结构
+
+```text
 Pixelate_Filter/
-├── index.html          # 主页面
-├── css/
-│   ├── reset.css       # 样式重置
-│   ├── main.css        # 主样式（像素风 UI）
-│   └── responsive.css  # 响应式适配
-├── js/
-│   ├── app.js          # 主逻辑入口
-│   ├── pixelate.js     # 像素化核心算法
-│   ├── palette.js      # 调色板数据与方法
-│   ├── camera.js       # 摄像头功能模块
-│   ├── history.js      # 历史记录管理
-│   └── utils.js        # 工具函数
-├── assets/
-│   └── icons/          # 像素风图标
-└── README.md
+├─ index.html
+├─ package.json
+├─ vite.config.ts
+├─ tsconfig.json
+├─ src/
+│  ├─ App.vue
+│  ├─ main.ts
+│  ├─ styles.css
+│  └─ lib/
+│     ├─ camera.ts
+│     ├─ history.ts
+│     ├─ palettes.ts
+│     └─ pixelate.ts
+└─ document/
+   └─ Pixelate_Filter-PRD.md
 ```
-
-## 🛠️ 技术栈
-
-| 层级 | 技术选型 |
-|------|----------|
-| 核心语言 | HTML5 + CSS3 + JavaScript (ES6+) |
-| 像素处理 | Canvas API（`getImageData` / `putImageData`） |
-| UI | 原生实现 + CSS 像素风动画 |
-| 响应式 | CSS Grid + Flexbox + 媒体查询 |
-| 本地存储 | LocalStorage |
-| 摄像头 | `getUserMedia` API |
-
-## 🎯 核心算法
-
-```
-1. 将原图绘制到离屏 Canvas，缩小至 (原宽/像素块大小) × (原高/像素块大小)
-2. 遍历缩小后的每个像素，将其颜色映射至当前调色板的最近颜色（欧氏距离）
-3. 使用最近邻插值（imageSmoothingEnabled = false）放大回原尺寸
-4. 输出像素化结果
-```
-
-## 📱 兼容性
-
-| 平台 | 要求 |
-|------|------|
-| 桌面端 | Chrome 90+ / Firefox 88+ / Safari 14+ / Edge 90+ |
-| 移动端 | iOS Safari 14+ / Android Chrome 90+ |
-| 响应式 | 支持 320px ~ 1920px 宽度 |
-
-## 🔒 隐私安全
-
-- ✅ 纯前端处理，图片**不会**上传至任何服务器
-- ✅ 所有历史记录仅保存在您的浏览器 LocalStorage 中
-- ✅ 清除浏览器数据后历史记录同步消失
-
-## 📝 License
-
-MIT License © 2026 Pixelate_Filter
-
----
-
-*Made with ❤️ and pixel art*
