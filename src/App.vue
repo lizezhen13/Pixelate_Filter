@@ -191,7 +191,7 @@ async function handleImageFile(file: File): Promise<void> {
     resultDataUrl.value = '';
     blockSize.value = recommendBlockSize(image.naturalWidth, image.naturalHeight);
 
-    await nextTick();
+    await waitForPreviewCanvases();
     drawOriginalImage(image);
     runPixelate(false);
   } catch (error) {
@@ -211,6 +211,27 @@ function loadImage(file: File): Promise<HTMLImageElement> {
     };
     reader.readAsDataURL(file);
   });
+}
+
+async function waitForPreviewCanvases(): Promise<void> {
+  await nextTick();
+
+  for (let index = 0; index < 60; index += 1) {
+    const original = originalCanvas.value;
+    const result = resultCanvas.value;
+
+    if (
+      original?.isConnected &&
+      result?.isConnected &&
+      original.clientWidth > 0 &&
+      result.clientWidth > 0
+    ) {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      return;
+    }
+
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  }
 }
 
 function drawOriginalImage(image: HTMLImageElement): void {
@@ -310,6 +331,9 @@ function runPixelate(silent: boolean): void {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.imageSmoothingEnabled = false;
         context.drawImage(output, 0, 0);
+        if (currentImage.value) {
+          drawOriginalImage(currentImage.value);
+        }
         resultDataUrl.value = output.toDataURL('image/png');
 
         scheduleHistorySave();
@@ -456,7 +480,7 @@ async function captureFromCamera(): Promise<void> {
     resultDataUrl.value = '';
     blockSize.value = recommendBlockSize(image.naturalWidth, image.naturalHeight);
     closeCameraModal();
-    await nextTick();
+    await waitForPreviewCanvases();
     drawOriginalImage(image);
     runPixelate(false);
   };
