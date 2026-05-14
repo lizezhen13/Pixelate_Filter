@@ -484,10 +484,21 @@ onBeforeUnmount(() => {
     <div class="onboarding-pixel f3" aria-hidden="true" />
     <div class="onboarding-pixel f4" aria-hidden="true" />
     <div class="onboarding-pixel f5" aria-hidden="true" />
+    <div class="onboarding-pixel f6" aria-hidden="true" />
+    <div class="onboarding-pixel f7" aria-hidden="true" />
+    <div class="onboarding-pixel f8" aria-hidden="true" />
+    <div class="onboarding-pixel f9" aria-hidden="true" />
+    <div class="onboarding-pixel f10" aria-hidden="true" />
+    <div class="onboarding-pixel f11" aria-hidden="true" />
+    <div class="onboarding-pixel f12" aria-hidden="true" />
+    <div class="onboarding-pixel f13" aria-hidden="true" />
+    <div class="onboarding-pixel f14" aria-hidden="true" />
+    <div class="onboarding-pixel f15" aria-hidden="true" />
+    <div class="onboarding-pixel f16" aria-hidden="true" />
     <div class="onboarding-chip chip-1">CANVAS LIVE</div>
     <div class="onboarding-chip chip-2">RETRO PALETTE</div>
 
-    <div class="onboarding-hero-card stagger-item">
+    <div class="onboarding-hero-copy stagger-item">
       <div class="onboarding-mark" aria-hidden="true">
         <span />
         <span />
@@ -496,8 +507,9 @@ onBeforeUnmount(() => {
       </div>
       <h1>把任意图片炸成复古像素画</h1>
       <p>
-        上传或拍摄一张图片，Pixelate_Filter 会用 Canvas 实时压缩色彩、放大像素块，并套上 GameBoy、Arcade
-        或 Cyberpunk 调色板。
+        上传图片/随手拍摄即解锁像素魔法！Pixelate_Filter 基于 Canvas
+        实时演算，智能压缩色彩、重塑大块像素格，自带 GameBoy 经典复古、Arcade 街机潮酷、Cyberpunk
+        未来霓虹等多类滤镜调色，一秒解锁复古像素氛围感。
       </p>
       <button class="onboarding-start" type="button" @click="enterWorkspace">开始使用</button>
     </div>
@@ -528,9 +540,15 @@ onBeforeUnmount(() => {
       <nav class="header-actions" aria-label="全局操作">
         <button class="icon-text-button" type="button" title="打开历史记录" @click="showHistoryDrawer = true">
           <History :size="18" aria-hidden="true" />
-          <span>历史</span>
+          <span>历史记录</span>
         </button>
-        <a class="icon-button" href="https://github.com" target="_blank" rel="noopener" title="GitHub">
+        <a
+          class="icon-button"
+          href="https://github.com/lizezhen13/Pixelate_Filter.git"
+          target="_blank"
+          rel="noopener"
+          title="GitHub"
+        >
           <Github :size="20" aria-hidden="true" />
           <span class="sr-only">GitHub</span>
         </a>
