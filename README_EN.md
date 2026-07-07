@@ -1,4 +1,6 @@
-# 🖼️ Pixelate Filter / Image Pixelation Tool
+<div align="center">
+  <h1>🖼️ Pixelate Filter / Image Pixelation Tool</h1>
+</div>
 
 <div align="center">
   🌐 <a href="./README.md">中文</a> | English

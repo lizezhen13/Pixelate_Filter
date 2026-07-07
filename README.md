@@ -1,4 +1,6 @@
-# 🖼️ Pixelate Filter / 图片像素化工具
+<div align="center">
+  <h1>🖼️ Pixelate Filter / 图片像素化工具</h1>
+</div>
 
 <div align="center">
   🌐 中文 | <a href="./README_EN.md">English</a>
